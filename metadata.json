@@ -1,0 +1,6 @@
+{
+  "name": "City General Hospital",
+  "description": "Full-service hospital portal with online patient portal, real-time appointment booking, doctor directory, emergency alerts, and health news blog.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}

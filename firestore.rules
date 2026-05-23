@@ -1,0 +1,115 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // 1. Global Safety Net (Default Deny Catch-all)
+    match /{document=**} {
+      allow read, write: if false;
+    }
+
+    // 2. Global Safety and Identity Helpers
+    function isSignedIn() {
+      return request.auth != null;
+    }
+
+    function isOwner(userId) {
+      return isSignedIn() && request.auth.uid == userId;
+    }
+
+    function incoming() {
+      return request.resource.data;
+    }
+
+    function existing() {
+      return resource.data;
+    }
+
+    function isValidId(id) {
+      return id is string && id.size() <= 128 && id.matches('^[a-zA-Z0-9_-]+$');
+    }
+
+    function isAdmin() {
+      return isSignedIn() && (
+        exists(/databases/$(database)/documents/admins/$(request.auth.uid)) ||
+        request.auth.token.email == 'abdullahtahirasif@gmail.com' ||
+        request.auth.token.email == 'admin@citygeneral.org'
+      );
+    }
+
+    // 3. User Entity Validation Blueprint
+    function isValidUser(data) {
+      return data.keys().hasAll(['uid', 'name', 'email', 'phone', 'dob', 'createdAt'])
+        && data.keys().size() >= 6
+        && data.uid is string && data.uid.size() <= 128
+        && data.name is string && data.name.size() > 0 && data.name.size() <= 128
+        && data.email is string && data.email.size() > 0 && data.email.size() <= 128
+        && data.phone is string && data.phone.size() > 0 && data.phone.size() <= 64
+        && data.dob is string && data.dob.size() > 0 && data.dob.size() <= 64
+        && data.createdAt is string && data.createdAt.size() <= 128;
+    }
+
+    // 4. Appointment Entity Validation Blueprint
+    function isValidAppointment(data) {
+      return data.keys().hasAll([
+        'id', 'patientName', 'patientPhone', 'patientEmail', 'patientDob', 
+        'doctorId', 'doctorName', 'specialty', 'date', 'timeSlot', 
+        'reason', 'status', 'userId', 'createdAt'
+      ])
+        && data.keys().size() >= 14
+        && data.id is string && data.id.size() <= 128
+        && data.patientName is string && data.patientName.size() > 0 && data.patientName.size() <= 128
+        && data.patientPhone is string && data.patientPhone.size() > 0 && data.patientPhone.size() <= 64
+        && data.patientEmail is string && data.patientEmail.size() > 0 && data.patientEmail.size() <= 128
+        && data.patientDob is string && data.patientDob.size() > 0 && data.patientDob.size() <= 64
+        && data.doctorId is string && data.doctorId.size() <= 128
+        && data.doctorName is string && data.doctorName.size() > 0 && data.doctorName.size() <= 128
+        && data.specialty is string && data.specialty.size() > 0 && data.specialty.size() <= 128
+        && data.date is string && data.date.size() > 0 && data.date.size() <= 64
+        && data.timeSlot is string && data.timeSlot.size() > 0 && data.timeSlot.size() <= 64
+        && data.reason is string && data.reason.size() <= 1024
+        && data.status is string && (data.status == 'Scheduled' || data.status == 'Completed' || data.status == 'Cancelled')
+        && data.userId is string && data.userId.size() <= 128
+        && data.createdAt is string && data.createdAt.size() <= 128;
+    }
+
+    // 5. User Profiles Rules
+    match /users/{userId} {
+      allow get: if isOwner(userId) || isAdmin();
+      allow list: if isAdmin(); // Admin can view patient list to select patients
+      allow create: if isOwner(userId) && isValidUser(incoming()) && incoming().uid == userId;
+      allow update: if (isOwner(userId) || isAdmin()) && isValidUser(incoming()) && incoming().uid == userId
+        && (isAdmin() || incoming().createdAt == existing().createdAt); // Immutable creation time unless admin
+      allow delete: if isAdmin();
+    }
+
+    // Admins Collection Rules
+    match /admins/{adminId} {
+      allow read: if isSignedIn();
+      allow create, update, delete: if isAdmin();
+    }
+
+    // 6. Appointments Rules
+    match /appointments/{appointmentId} {
+      allow get: if isSignedIn() && (resource.data.userId == request.auth.uid || isAdmin());
+      allow list: if isSignedIn() && (resource.data.userId == request.auth.uid || isAdmin());
+
+      allow create: if isSignedIn() && isValidId(appointmentId) 
+        && (incoming().userId == request.auth.uid || isAdmin())
+        && isValidAppointment(incoming());
+
+      allow update: if isSignedIn() && isValidId(appointmentId)
+        && (existing().userId == request.auth.uid || isAdmin())
+        && (incoming().userId == request.auth.uid || isAdmin())
+        && isValidAppointment(incoming())
+        && (
+          isAdmin() ||
+          // Action: Cancel Checkup
+          (incoming().diff(existing()).affectedKeys().hasOnly(['status', 'updatedAt']) && incoming().status == 'Cancelled') ||
+          // Action: Reschedule Care Hour
+          (incoming().diff(existing()).affectedKeys().hasOnly(['date', 'timeSlot', 'updatedAt']))
+        );
+
+      allow delete: if isSignedIn() && (resource.data.userId == request.auth.uid || isAdmin());
+    }
+  }
+}

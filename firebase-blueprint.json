@@ -1,0 +1,51 @@
+{
+  "entities": {
+    "User": {
+      "title": "User Profile",
+      "description": "Registered patient profile containing their personal contact details and metadata.",
+      "type": "object",
+      "properties": {
+        "uid": { "type": "string", "description": "The unique user authentication ID." },
+        "name": { "type": "string", "description": "The patient's first and last name." },
+        "email": { "type": "string", "description": "The patient's login email address." },
+        "phone": { "type": "string", "description": "The patient's cell or contact phone number." },
+        "dob": { "type": "string", "description": "The patient's date of birth." },
+        "createdAt": { "type": "string", "description": "ISO timestamp representing profile registration." },
+        "primaryClinician": { "type": "string", "description": "Assigned clinician name." }
+      },
+      "required": ["uid", "name", "email", "phone", "dob", "createdAt"]
+    },
+    "Appointment": {
+      "title": "Clinical Appointment",
+      "description": "A scheduled reservation with a board-certified physician.",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string", "description": "The registration ID of the appointment." },
+        "patientName": { "type": "string", "description": "First and last name of the patient." },
+        "patientPhone": { "type": "string", "description": "Contact number of the patient." },
+        "patientEmail": { "type": "string", "description": "Personal email of the patient." },
+        "patientDob": { "type": "string", "description": "Date of birth of the patient." },
+        "doctorId": { "type": "string", "description": "Assigned doctor's unique identifier." },
+        "doctorName": { "type": "string", "description": "Assigned doctor's display name." },
+        "specialty": { "type": "string", "description": "Associated clinical specialization." },
+        "date": { "type": "string", "description": "Scheduled date of consult." },
+        "timeSlot": { "type": "string", "description": "Consultation hour slot." },
+        "reason": { "type": "string", "description": "Reason or medical symptoms described." },
+        "status": { "type": "string", "enum": ["Scheduled", "Completed", "Cancelled"] },
+        "userId": { "type": "string", "description": "The reference UID of the patient account." },
+        "createdAt": { "type": "string", "description": "ISO timestamp of date created." }
+      },
+      "required": ["id", "patientName", "patientPhone", "patientEmail", "patientDob", "doctorId", "doctorName", "specialty", "date", "timeSlot", "reason", "status", "userId", "createdAt"]
+    }
+  },
+  "firestore": {
+    "users/{userId}": {
+      "schema": "User",
+      "description": "Patient's demographic and account files."
+    },
+    "appointments/{appointmentId}": {
+      "schema": "Appointment",
+      "description": "Assigned consultation reservations scheduled by users."
+    }
+  }
+}
