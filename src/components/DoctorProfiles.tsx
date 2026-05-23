@@ -36,14 +36,15 @@ export default function DoctorProfiles({ onBookAppointment, onOpenMessageWithDoc
   return (
     <div id="doctor-profiles-section" className="space-y-8">
       {/* Upper filter block */}
-      <div className="bg-slate-50 p-6 rounded-3xl border border-slate-100 flex flex-col md:flex-row gap-4 items-center justify-between">
+      <div className="card-surface p-5 md:p-6 flex flex-col md:flex-row gap-4 items-center justify-between">
         <div className="relative w-full md:max-w-md">
           <input
-            type="text"
-            placeholder="Search active practitioners by name or credentials..."
+            type="search"
+            placeholder="Search by name, specialty, or credentials..."
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
-            className="w-full pl-10 pr-4 py-2.5 bg-white border border-slate-200 rounded-2xl focus:outline-none focus:ring-1 focus:ring-blue-500 text-sm font-medium text-slate-800 placeholder-slate-400"
+            aria-label="Search doctors"
+            className="input-field pl-10 pr-4 py-2.5 text-sm"
           />
           <Search className="w-4 h-4 text-slate-400 absolute left-3.5 top-3.5" />
         </div>
@@ -54,10 +55,10 @@ export default function DoctorProfiles({ onBookAppointment, onOpenMessageWithDoc
             <button
               key={spec}
               onClick={() => setSelectedSpecialty(spec)}
-              className={`px-4 py-2 rounded-xl text-xs font-semibold whitespace-nowrap transition-all ${
+              className={`px-4 py-2 rounded-xl text-xs font-bold whitespace-nowrap transition-all cursor-pointer ${
                 selectedSpecialty === spec
-                  ? 'bg-blue-600 text-white shadow-md shadow-blue-500/10'
-                  : 'bg-white text-slate-600 border border-slate-200 hover:border-slate-300 hover:text-slate-800'
+                  ? 'bg-cyan-700 text-white shadow-md shadow-cyan-500/20'
+                  : 'bg-white text-slate-600 border border-slate-200 hover:border-cyan-200 hover:text-cyan-800'
               }`}
             >
               {spec}
@@ -85,7 +86,7 @@ export default function DoctorProfiles({ onBookAppointment, onOpenMessageWithDoc
               animate={{ opacity: 1, scale: 1 }}
               transition={{ delay: idx * 0.05 }}
               key={doc.id}
-              className="bg-white rounded-3xl border border-slate-100 hover:border-slate-200 shadow-sm hover:shadow-xl hover:shadow-slate-100/40 transition-all flex flex-col h-full overflow-hidden group"
+              className="card-surface card-interactive flex flex-col h-full overflow-hidden group"
             >
               <div className="relative h-48 bg-slate-100 overflow-hidden shrink-0">
                 <img

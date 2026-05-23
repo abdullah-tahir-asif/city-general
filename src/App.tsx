@@ -15,6 +15,7 @@ import { Appointment, Doctor } from './types';
 import { DOCTORS } from './data/doctors';
 import { Heart, Phone, MapPin, Mail, Award, AlertCircle, Clock, ShieldCheck, HelpCircle, X, ChevronRight, Check } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
+import { useToast } from './components/Toast';
 
 // Seed initial upcoming appointments so the portal dashboard is filled on first load.
 const INITIAL_DEMO_APPOINTMENTS: Appointment[] = [
@@ -35,22 +36,33 @@ const INITIAL_DEMO_APPOINTMENTS: Appointment[] = [
   }
 ];
 
+function loadAppointments(): Appointment[] {
+  try {
+    const saved = localStorage.getItem('hospital_appointments');
+    if (saved) return JSON.parse(saved) as Appointment[];
+  } catch {
+    /* use demo fallback */
+  }
+  return INITIAL_DEMO_APPOINTMENTS;
+}
+
 export default function App() {
+  const { showToast } = useToast();
   const [activeView, setActiveView] = useState<'home' | 'doctors' | 'booking' | 'portal' | 'admin'>('home');
   const [showBulletin, setShowBulletin] = useState(false);
-  const [appointments, setAppointments] = useState<Appointment[]>(() => {
-    const saved = localStorage.getItem('hospital_appointments');
-    return saved ? JSON.parse(saved) : INITIAL_DEMO_APPOINTMENTS;
-  });
+  const [appointments, setAppointments] = useState<Appointment[]>(loadAppointments);
   
   const [selectedDoctorForBooking, setSelectedDoctorForBooking] = useState<Doctor | null>(null);
 
   const emergencySectionRef = useRef<HTMLDivElement>(null);
 
-  // Sync appointments to localStorage
   useEffect(() => {
-    localStorage.setItem('hospital_appointments', JSON.stringify(appointments));
-  }, [appointments]);
+    try {
+      localStorage.setItem('hospital_appointments', JSON.stringify(appointments));
+    } catch {
+      showToast('Could not save appointments locally. Your browser storage may be full.', 'error');
+    }
+  }, [appointments, showToast]);
 
   const handleScrollToEmergency = () => {
     // If we're not on home page, switch to home first
@@ -74,35 +86,41 @@ export default function App() {
 
   const handleAddAppointment = (newAppt: Appointment) => {
     setAppointments(prev => [newAppt, ...prev]);
+    showToast(`Appointment confirmed with ${newAppt.doctorName}`, 'success');
   };
 
   return (
-    <div className="min-h-screen bg-slate-50 flex flex-col font-sans selection:bg-blue-100 selection:text-blue-900" id="main-application">
+    <div className="app-shell min-h-screen flex flex-col font-sans selection:bg-cyan-100 selection:text-cyan-900" id="main-application">
       
       {/* Navbar */}
       <Navbar 
         activeView={activeView} 
         onSetView={(view) => {
           setActiveView(view);
-          window.scrollTo({ top: 0, behavior: 'instant' });
+          window.scrollTo({ top: 0, behavior: 'auto' });
         }}
         onScrollToEmergency={handleScrollToEmergency}
       />
 
       {/* Main Container */}
-      <main className="flex-grow max-w-7xl mx-auto w-full px-4 sm:px-6 lg:px-8 py-6 md:py-10 space-y-12">
+      <main id="main-content" className="flex-grow max-w-7xl mx-auto w-full px-4 sm:px-6 lg:px-8 py-6 md:py-10 space-y-10 md:space-y-12">
         
-        {/* Urgent ALERT BAR (Simulated clinical status) */}
-        <div className="bg-[#eff6ff] border border-blue-100/70 p-3.5 rounded-2xl flex items-center justify-between shadow-xs hover:border-blue-200 hover:bg-[#eff6ff]/80 transition-all duration-300">
-          <div className="flex items-center gap-2.5 text-xs text-blue-900 font-semibold leading-relaxed">
-            <span className="p-1 px-2.5 bg-blue-600 text-white font-black uppercase text-[8px] tracking-wide rounded-lg shrink-0 animate-pulse">
-              NEWS BULLETIN
+        <div
+          role="status"
+          className="card-surface p-4 flex flex-col sm:flex-row sm:items-center gap-3 sm:justify-between border-cyan-100 bg-gradient-to-r from-cyan-50/80 to-white"
+        >
+          <div className="flex items-start sm:items-center gap-3 text-sm text-slate-700 font-medium leading-relaxed">
+            <span className="px-2.5 py-1 bg-cyan-700 text-white font-bold uppercase text-[9px] tracking-wider rounded-lg shrink-0">
+              News
             </span>
-            <span>City General Hospital has completed the installation of our next-gen Cardiac Intensive Suite. Seasonal flu vaccines are now fully authorized.</span>
+            <span>
+              Our new Cardiac Intensive Suite is now open. Seasonal flu vaccines are available — book online anytime.
+            </span>
           </div>
-          <button 
+          <button
+            type="button"
             onClick={() => setShowBulletin(true)}
-            className="hidden sm:inline text-xs font-bold text-blue-600 hover:text-blue-800 transition-colors shrink-0 cursor-pointer"
+            className="text-xs font-bold text-cyan-700 hover:text-cyan-900 shrink-0 cursor-pointer sm:px-3 py-1.5 rounded-lg hover:bg-cyan-50 transition-colors"
           >
             Learn more →
           </button>
@@ -132,8 +150,8 @@ export default function App() {
                 {/* Emergency Tracker Console Anchor */}
                 <div id="emergency-widget-container" ref={emergencySectionRef} className="pt-2">
                   <div className="mb-4">
-                    <span className="text-[10px] tracking-widest uppercase text-red-650 font-extrabold block">Immediate Helpdesk</span>
-                    <h3 className="text-xl font-bold text-slate-900 tracking-tight mt-0.5">Emergency Trauma Center & ER wait-times</h3>
+                    <span className="section-eyebrow text-red-600 block">Immediate helpdesk</span>
+                    <h3 className="text-xl font-extrabold text-slate-900 tracking-tight mt-1 font-display">Emergency trauma center & ER wait times</h3>
                   </div>
                   <EmergencyWidget />
                 </div>
@@ -143,8 +161,8 @@ export default function App() {
             {activeView === 'doctors' && (
               <div className="space-y-6">
                 <div>
-                  <span className="text-xs font-bold text-blue-600 uppercase tracking-widest block mb-1">Our Directory</span>
-                  <h2 className="text-3xl font-black text-slate-900 tracking-tight font-display">Meet Our Board-Certified Clinicians</h2>
+                  <span className="section-eyebrow block mb-1">Our directory</span>
+                  <h2 className="text-3xl font-extrabold text-slate-900 tracking-tight font-display">Meet our board-certified clinicians</h2>
                   <p className="text-xs text-slate-500 mt-1">Filter by specialization, ratings, and days available to directly reserve slots.</p>
                 </div>
                 <DoctorProfiles 
@@ -160,8 +178,8 @@ export default function App() {
             {activeView === 'booking' && (
               <div className="space-y-6">
                 <div>
-                  <span className="text-xs font-bold text-blue-600 uppercase tracking-widest block mb-1 font-mono">Real-time scheduling</span>
-                  <h2 className="text-3xl font-black text-slate-900 tracking-tight font-display">Reserve Outpatient Checkups</h2>
+                  <span className="section-eyebrow block mb-1">Real-time scheduling</span>
+                  <h2 className="text-3xl font-extrabold text-slate-900 tracking-tight font-display">Reserve outpatient checkups</h2>
                 </div>
                 <AppointmentBooking 
                   preSelectedDoctor={selectedDoctorForBooking} 
@@ -177,8 +195,8 @@ export default function App() {
             {activeView === 'portal' && (
               <div className="space-y-6">
                 <div>
-                  <span className="text-xs font-bold text-blue-600 uppercase tracking-widest block mb-1">Client Vault</span>
-                  <h2 className="text-3xl font-black text-slate-900 tracking-tight font-display">Patient Portal Central</h2>
+                  <span className="section-eyebrow block mb-1">Client vault</span>
+                  <h2 className="text-3xl font-extrabold text-slate-900 tracking-tight font-display">Patient portal</h2>
                 </div>
                 <PatientPortal 
                   appointments={appointments} 
@@ -197,8 +215,8 @@ export default function App() {
             {activeView === 'admin' && (
               <div className="space-y-6">
                 <div>
-                  <span className="text-xs font-bold text-blue-600 uppercase tracking-widest block mb-1">Administrative Center</span>
-                  <h2 className="text-3xl font-black text-slate-900 tracking-tight font-display">Executive Command Console</h2>
+                  <span className="section-eyebrow block mb-1">Administrative center</span>
+                  <h2 className="text-3xl font-extrabold text-slate-900 tracking-tight font-display">Admin console</h2>
                 </div>
                 <AdminPortal />
               </div>
@@ -209,22 +227,22 @@ export default function App() {
       </main>
 
       {/* Persistent Footer with address parameters & emergency contact information */}
-      <footer className="bg-white border-t border-slate-200 mt-16 text-slate-600 font-sans" id="hospital-footer">
+      <footer className="bg-white/90 backdrop-blur border-t border-slate-200/80 mt-16 text-slate-600 font-sans" id="hospital-footer">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
           <div className="grid grid-cols-1 md:grid-cols-12 gap-8">
             
             {/* Branding Column */}
             <div className="md:col-span-4 space-y-4">
               <div className="flex items-center gap-2">
-                <div className="p-2 bg-blue-600 rounded-xl text-white">
-                  <Heart className="w-4 h-4 fill-white stroke-blue-600" />
+                <div className="p-2 bg-gradient-to-br from-cyan-600 to-teal-700 rounded-xl text-white shadow-sm">
+                  <Heart className="w-4 h-4 fill-white stroke-cyan-700" />
                 </div>
                 <span className="text-sm font-black text-slate-900 tracking-tight">City General Hospital</span>
               </div>
               <p className="text-[11px] text-slate-500 leading-relaxed max-w-sm font-medium">
                 Pioneering evidence-based clinical medicine and emergency services since 1984. Accredited with top honors by the Joint Commission on Healthcare Safety standards.
               </p>
-              <div className="flex items-center gap-2 text-[10px] font-bold py-1 px-2.5 bg-blue-50/50 border border-blue-100 rounded-full text-blue-700 w-fit">
+              <div className="flex items-center gap-2 text-[10px] font-bold py-1 px-2.5 bg-cyan-50 border border-cyan-100 rounded-full text-cyan-800 w-fit">
                 <Award className="w-3.5 h-3.5" /> Approved HIPAA Vault Facility
               </div>
             </div>
@@ -259,7 +277,7 @@ export default function App() {
               <div className="space-y-3.5 text-xs font-semibold">
                 <div>
                   <span className="text-slate-400 block text-[10px] font-bold">24/7 Priority Emergency Line</span>
-                  <a href="tel:1-800-555-0199" className="text-slate-900 font-bold block text-sm hover:underline hover:text-red-650">
+                  <a href="tel:1-800-555-0199" className="text-slate-900 font-bold block text-sm hover:underline hover:text-red-600">
                     1-800-555-0199
                   </a>
                 </div>
@@ -317,7 +335,7 @@ export default function App() {
               {/* Header */}
               <div className="flex justify-between items-start">
                 <div className="space-y-1">
-                  <div className="inline-flex items-center gap-1 bg-amber-50 text-amber-850 text-[9px] font-black uppercase tracking-wider px-2 py-0.5 rounded-full border border-amber-200">
+                  <div className="inline-flex items-center gap-1 bg-amber-50 text-amber-900 text-[9px] font-black uppercase tracking-wider px-2 py-0.5 rounded-full border border-amber-200">
                     <AlertCircle className="w-3 h-3 shrink-0" />
                     <span>Official Update</span>
                   </div>
@@ -356,7 +374,7 @@ export default function App() {
                     setShowBulletin(false);
                     setActiveView('booking');
                   }}
-                  className="flex-1 py-3 bg-blue-600 hover:bg-blue-700 text-white rounded-xl text-xs font-bold shadow-md shadow-blue-500/10 cursor-pointer transition-all text-center"
+                  className="flex-1 py-3 bg-cyan-700 hover:bg-cyan-800 text-white rounded-xl text-xs font-bold shadow-md shadow-cyan-500/15 cursor-pointer transition-all text-center"
                 >
                   Schedule Checkup Now
                 </button>

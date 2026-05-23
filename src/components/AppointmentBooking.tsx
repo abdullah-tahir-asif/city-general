@@ -136,9 +136,9 @@ export default function AppointmentBooking({ preSelectedDoctor, onAddAppointment
   // Render auth barrier in case patient is unauthenticated
   if (authLoading) {
     return (
-      <div className="bg-white rounded-3xl p-12 border border-slate-100 shadow-xl shadow-slate-100/30 flex flex-col items-center justify-center min-h-[400px]" id="booking-loading-view">
-        <div className="w-10 h-10 border-4 border-blue-500/30 border-t-blue-600 rounded-full animate-spin mb-4" />
-        <p className="text-xs text-slate-550 font-bold uppercase tracking-widest font-mono">Synchronizing Care Session...</p>
+      <div className="card-surface p-12 flex flex-col items-center justify-center min-h-[400px]" id="booking-loading-view">
+        <div className="w-10 h-10 border-4 border-cyan-200 border-t-cyan-600 rounded-full animate-spin mb-4" role="status" aria-label="Loading" />
+        <p className="text-xs text-slate-500 font-bold uppercase tracking-widest">Loading your session…</p>
       </div>
     );
   }
@@ -146,10 +146,10 @@ export default function AppointmentBooking({ preSelectedDoctor, onAddAppointment
   if (!user) {
     return (
       <div className="space-y-6 max-w-4xl mx-auto" id="booking-auth-gate-boundary">
-        <div className="bg-[#eff6ff] border border-blue-100 p-4 rounded-2xl flex items-start gap-3 shadow-xs">
-          <ShieldCheck className="w-5 h-5 text-blue-600 shrink-0 mt-0.5" />
-          <div className="text-xs text-blue-900 font-medium leading-relaxed">
-            <span className="font-extrabold uppercase text-[10px] bg-blue-600 text-white px-2 py-0.5 rounded-md mr-1.5 inline-block">Security Mandate</span>
+        <div className="bg-cyan-50 border border-cyan-100 p-4 rounded-2xl flex items-start gap-3">
+          <ShieldCheck className="w-5 h-5 text-cyan-700 shrink-0 mt-0.5" />
+          <div className="text-xs text-cyan-950 font-medium leading-relaxed">
+            <span className="font-extrabold uppercase text-[10px] bg-cyan-700 text-white px-2 py-0.5 rounded-md mr-1.5 inline-block">Sign in required</span>
             City General Hospital strictly enforces a <strong>verified patient registration check</strong>. Please sign in or register your HIPAA-compliant dossier profile below before choosing dates.
           </div>
         </div>
@@ -162,7 +162,7 @@ export default function AppointmentBooking({ preSelectedDoctor, onAddAppointment
   }
 
   return (
-    <div className="bg-white rounded-3xl border border-slate-100 shadow-xl shadow-slate-100/30 overflow-hidden" id="appointment-booking-wizard">
+    <div className="card-surface overflow-hidden shadow-lg" id="appointment-booking-wizard">
       <AnimatePresence mode="wait">
         {!bookingResult ? (
           <motion.div 

@@ -71,9 +71,8 @@ export default function EmergencyWidget() {
   };
 
   return (
-    <div className="bg-white rounded-3xl border border-rose-100 shadow-xl shadow-rose-50/30 overflow-hidden" id="emergency-widget">
-      {/* Red Alert Banner */}
-      <div className="bg-gradient-to-r from-red-600 to-rose-500 text-white p-6">
+    <div className="card-surface border-rose-100 shadow-lg shadow-rose-100/40 overflow-hidden" id="emergency-widget">
+      <div className="bg-gradient-to-r from-red-600 via-rose-600 to-red-700 text-white p-6 md:p-7">
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-3">
             <div className="p-2.5 bg-white/10 rounded-xl animate-pulse">

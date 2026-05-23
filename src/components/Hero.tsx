@@ -1,5 +1,5 @@
 import React from 'react';
-import { ShieldCheck, Activity, Calendar, Lock, BookOpen, Clock, Heart, ArrowUpRight } from 'lucide-react';
+import { ShieldCheck, Activity, Calendar, Lock, BookOpen, Clock, Heart, ArrowUpRight, ChevronRight, Sparkles } from 'lucide-react';
 import { motion } from 'motion/react';
 
 interface HeroProps {
@@ -7,202 +7,213 @@ interface HeroProps {
   onScrollToEmergency: () => void;
 }
 
+const SERVICES = [
+  {
+    icon: Heart,
+    title: 'Cardiovascular Institute',
+    desc: 'Interventional cardiology, diagnostic imaging, and hypertension wellness programs.',
+    color: 'bg-cyan-50 text-cyan-700',
+    cta: 'Consult experts',
+    action: 'doctors' as const,
+    linkClass: 'text-cyan-700',
+  },
+  {
+    icon: Activity,
+    title: 'Neurology & Stroke Center',
+    desc: 'Stroke recovery, migraine care, and peripheral neuropathy treatment plans.',
+    color: 'bg-emerald-50 text-emerald-700',
+    cta: 'Consult experts',
+    action: 'doctors' as const,
+    linkClass: 'text-emerald-700',
+  },
+  {
+    icon: Clock,
+    title: 'Level 1 Emergency Center',
+    desc: '24/7 trauma units, pediatric emergency teams, and rapid intake protocols.',
+    color: 'bg-red-50 text-red-600',
+    cta: 'Live wait times',
+    action: 'emergency' as const,
+    linkClass: 'text-red-600',
+  },
+  {
+    icon: BookOpen,
+    title: 'Preventative Medicine',
+    desc: 'Annual physicals, vaccinations, and dietary counseling for long-term health.',
+    color: 'bg-violet-50 text-violet-700',
+    cta: 'Book checkup',
+    action: 'booking' as const,
+    linkClass: 'text-violet-700',
+  },
+];
+
 export default function Hero({ onSetView, onScrollToEmergency }: HeroProps) {
   return (
-    <div className="space-y-12">
-      {/* Upper Main Intro Section */}
-      <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-center pt-4 md:pt-10">
-        
-        {/* Caption & Call to Action */}
-        <div className="lg:col-span-7 space-y-6 text-center lg:text-left">
-          <div className="inline-flex items-center gap-1.5 bg-blue-50/80 px-4 py-1.5 rounded-full border border-blue-100">
-            <ShieldCheck className="w-4 h-4 text-blue-600" />
-            <span className="text-[10px] font-black uppercase tracking-widest text-blue-700">
-              Joint Commission National Quality Champion
+    <div className="space-y-14">
+      <div className="grid grid-cols-1 lg:grid-cols-12 gap-10 lg:gap-12 items-center pt-2 md:pt-6">
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.5 }}
+          className="lg:col-span-7 space-y-6 text-center lg:text-left"
+        >
+          <div className="inline-flex items-center gap-2 bg-white/80 px-4 py-2 rounded-full border border-cyan-100 shadow-sm">
+            <Sparkles className="w-4 h-4 text-cyan-600" />
+            <span className="text-[10px] font-bold uppercase tracking-widest text-cyan-800">
+              Joint Commission Quality Champion
             </span>
           </div>
 
-          <h1 className="text-4xl md:text-5xl font-black text-slate-900 tracking-tight leading-none font-display">
-            Comprehensive Clinical Care <br className="hidden md:inline" />
-            <span className="text-blue-600">Centered Around You</span>
+          <h1 className="text-4xl sm:text-5xl lg:text-[3.25rem] font-extrabold text-slate-900 tracking-tight leading-[1.05] font-display">
+            Comprehensive care{' '}
+            <span className="gradient-text block sm:inline">centered around you</span>
           </h1>
 
-          <p className="text-xs md:text-sm text-slate-500 max-w-xl leading-relaxed font-semibold">
-            At City General Hospital, our network of board-certified clinicians combine cutting-edge procedural technologies with deep human empathy. We specialize in providing comprehensive healthcare, from neonatal units to advanced cardiovascular treatments.
+          <p className="text-sm md:text-base text-slate-600 max-w-xl mx-auto lg:mx-0 leading-relaxed">
+            Board-certified clinicians, advanced technology, and compassionate support — from neonatal care to cardiovascular treatment, all in one trusted network.
           </p>
 
-          <div className="flex flex-wrap gap-3 pt-2 justify-center lg:justify-start">
-            <button
-              onClick={() => onSetView('booking')}
-              className="py-3 px-6 bg-blue-600 hover:bg-blue-700 text-white rounded-2xl text-xs font-bold shadow-lg shadow-blue-500/10 cursor-pointer hover:shadow-xl transition-all flex items-center gap-1.5"
-            >
+          <div className="flex flex-wrap gap-3 pt-1 justify-center lg:justify-start">
+            <button type="button" onClick={() => onSetView('booking')} className="btn-primary">
               <Calendar className="w-4 h-4" />
-              <span>Schedule Booking Online</span>
+              Schedule online
             </button>
-            <button
-              onClick={() => onSetView('portal')}
-              className="py-3 px-6 bg-slate-100 hover:bg-slate-200 text-slate-800 rounded-2xl text-xs font-bold cursor-pointer transition-all flex items-center gap-1.5 border border-slate-200 hover:border-slate-300"
-            >
-              <Lock className="w-4 h-4 text-blue-600" />
-              <span>Access Encrypted Portal</span>
+            <button type="button" onClick={() => onSetView('portal')} className="btn-secondary">
+              <Lock className="w-4 h-4 text-cyan-600" />
+              Patient portal
             </button>
           </div>
 
-          {/* Core Trust Stats Bar */}
-          <div className="grid grid-cols-3 gap-4 pt-6 text-center divide-x divide-slate-100">
-            <div className="space-y-1">
-              <span className="text-xl md:text-2xl font-black text-slate-900 font-mono">15 Min</span>
-              <span className="text-[10px] text-slate-400 font-bold block">Avg. Trauma Intake</span>
+          <div className="grid grid-cols-3 gap-3 pt-4 max-w-lg mx-auto lg:mx-0">
+            {[
+              { value: '15 min', label: 'Avg. trauma intake' },
+              { value: '250+', label: 'Certified doctors' },
+              { value: '99.4%', label: 'Patient satisfaction' },
+            ].map((stat) => (
+              <div
+                key={stat.label}
+                className="card-surface px-3 py-4 text-center"
+              >
+                <span className="text-lg sm:text-xl font-extrabold text-slate-900 font-display block">
+                  {stat.value}
+                </span>
+                <span className="text-[10px] text-slate-500 font-semibold mt-1 block leading-tight">
+                  {stat.label}
+                </span>
+              </div>
+            ))}
+          </div>
+        </motion.div>
+
+        <motion.div
+          initial={{ opacity: 0, x: 24 }}
+          animate={{ opacity: 1, x: 0 }}
+          transition={{ duration: 0.55, delay: 0.1 }}
+          className="lg:col-span-5 relative"
+        >
+          <div className="absolute -inset-4 bg-gradient-to-br from-cyan-400/20 via-indigo-400/10 to-emerald-400/10 rounded-[2rem] blur-2xl" />
+
+          <div className="relative card-surface p-6 space-y-4 shadow-glow border-cyan-100/60">
+            <div className="p-4 bg-gradient-to-r from-emerald-50 to-cyan-50 rounded-2xl border border-emerald-100/80 flex items-center gap-3">
+              <div className="p-2.5 bg-white rounded-xl text-emerald-600 shadow-sm">
+                <Activity className="w-5 h-5" />
+              </div>
+              <div className="text-left">
+                <span className="text-[9px] uppercase font-bold tracking-wider text-emerald-700 block">
+                  Live system status
+                </span>
+                <span className="text-sm font-bold text-slate-900">
+                  Cardiovascular & trauma units fully staffed
+                </span>
+              </div>
+              <span className="ml-auto w-2 h-2 rounded-full bg-emerald-500 animate-pulse" aria-hidden />
             </div>
-            <div className="space-y-1">
-              <span className="text-xl md:text-2xl font-black text-slate-900 font-mono">250+</span>
-              <span className="text-[10px] text-slate-400 font-bold block">Certified Doctors</span>
-            </div>
-            <div className="space-y-1">
-              <span className="text-xl md:text-2xl font-black text-slate-900 font-mono">99.4%</span>
-              <span className="text-[10px] text-slate-400 font-bold block">Patient Satisfaction</span>
+
+            {[
+              {
+                icon: Lock,
+                iconBg: 'bg-cyan-50 text-cyan-700',
+                eyebrow: 'Secure patient vault',
+                title: 'Lab results & prescriptions',
+                onClick: () => onSetView('portal'),
+              },
+              {
+                icon: Calendar,
+                iconBg: 'bg-rose-50 text-rose-600',
+                eyebrow: 'Instant booking',
+                title: 'Virtual or in-person visits',
+                onClick: () => onSetView('booking'),
+              },
+            ].map((card) => (
+              <div
+                key={card.title}
+                className="p-4 bg-slate-50/80 rounded-2xl border border-slate-100 flex items-center justify-between group hover:border-cyan-200 hover:bg-white transition-all"
+              >
+                <div className="flex items-center gap-3">
+                  <div className={`p-2.5 rounded-xl ${card.iconBg}`}>
+                    <card.icon className="w-5 h-5" />
+                  </div>
+                  <div className="text-left">
+                    <span className="text-[9px] font-semibold text-slate-400 uppercase block">
+                      {card.eyebrow}
+                    </span>
+                    <span className="text-sm font-bold text-slate-900">{card.title}</span>
+                  </div>
+                </div>
+                <button
+                  type="button"
+                  onClick={card.onClick}
+                  className="p-2 rounded-xl border border-slate-200 bg-white text-slate-500 group-hover:text-cyan-700 group-hover:border-cyan-200 transition-colors cursor-pointer"
+                  aria-label={`Open ${card.title}`}
+                >
+                  <ArrowUpRight className="w-4 h-4" />
+                </button>
+              </div>
+            ))}
+
+            <div className="flex items-center gap-2 pt-1 text-[10px] text-slate-500 font-medium justify-center">
+              <ShieldCheck className="w-3.5 h-3.5 text-cyan-600" />
+              HIPAA-compliant · 256-bit encrypted
             </div>
           </div>
-        </div>
-
-        {/* Dynamic Card Illustration Layout */}
-        <div className="lg:col-span-5 relative">
-          <div className="absolute inset-0 bg-blue-400/5 rounded-full filter blur-3xl" />
-          
-          <div className="relative bg-gradient-to-tr from-slate-50 to-blue-50 p-6 rounded-3xl border border-slate-100/80 shadow-inner flex flex-col gap-4">
-            {/* Live Indicator Alert */}
-            <div className="p-4 bg-white rounded-2xl border border-slate-100 shadow-sm flex items-center gap-3">
-              <div className="p-2 bg-emerald-50 rounded-lg text-emerald-600">
-                <Activity className="w-5 h-5 animate-pulse" />
-              </div>
-              <div>
-                <span className="text-[9px] uppercase font-bold tracking-wider text-emerald-600 block">System Diagnostic Active</span>
-                <span className="text-xs font-bold text-slate-900 mt-0.5 inline-block">Cardiovascular & Trauma units fully staffed.</span>
-              </div>
-            </div>
-
-            {/* Micro Quick Portal card */}
-            <div className="p-4 bg-white rounded-2xl border border-slate-100 shadow-sm flex items-center justify-between">
-              <div className="flex items-center gap-3">
-                <div className="p-2 bg-blue-50 rounded-lg text-blue-600">
-                  <Lock className="w-5 h-5" />
-                </div>
-                <div>
-                  <span className="text-[9px] font-semibold text-slate-400 uppercase block">Secured Patients Vault</span>
-                  <span className="text-xs font-bold text-slate-900">Lab Results & Drug Refills</span>
-                </div>
-              </div>
-              <button 
-                onClick={() => onSetView('portal')}
-                className="p-1.5 hover:bg-slate-50 border border-slate-100 rounded-lg text-slate-600 hover:text-blue-600 transition-colors"
-                title="Enter Encrypted Directory"
-              >
-                <ArrowUpRight className="w-4 h-4" />
-              </button>
-            </div>
-
-            {/* Quick Consultation card */}
-            <div className="p-4 bg-white rounded-2xl border border-slate-100 shadow-sm flex items-center justify-between">
-              <div className="flex items-center gap-3">
-                <div className="p-2 bg-rose-50 rounded-lg text-rose-600">
-                  <Calendar className="w-5 h-5" />
-                </div>
-                <div>
-                  <span className="text-[9px] font-semibold text-slate-400 uppercase block">Instantly Book Doctor Slots</span>
-                  <span className="text-xs font-bold text-slate-900">Virtual or In-Person Checkups</span>
-                </div>
-              </div>
-              <button 
-                onClick={() => onSetView('booking')}
-                className="p-1.5 hover:bg-slate-50 border border-slate-100 rounded-lg text-slate-600 hover:text-blue-600 transition-colors"
-                title="Open Online Appointment Calendar"
-              >
-                <ArrowUpRight className="w-4 h-4" />
-              </button>
-            </div>
-          </div>
-        </div>
-
+        </motion.div>
       </div>
 
-      {/* Grid of Interactive Service Panels */}
-      <div className="space-y-4">
-        <div>
-          <span className="text-[10px] tracking-widest uppercase text-blue-600 font-extrabold block">Primary Specializations</span>
-          <h3 className="text-xl font-black text-slate-900 tracking-tight mt-1 font-display">Explore Our Medical Services</h3>
+      <section aria-labelledby="services-heading">
+        <div className="mb-6">
+          <span className="section-eyebrow">Primary specializations</span>
+          <h2 id="services-heading" className="text-2xl font-extrabold text-slate-900 tracking-tight mt-1 font-display">
+            Explore our medical services
+          </h2>
         </div>
 
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-          <div className="bg-white p-5 rounded-3xl border border-slate-100 hover:border-slate-200 transition-all space-y-3">
-            <span className="p-2 bg-blue-50 text-blue-600 rounded-xl inline-block">
-              <Heart className="w-5 h-5 fill-blue-50 stroke-blue-600" />
-            </span>
-            <h4 className="text-sm font-bold text-slate-900">Cardiovascular Institute</h4>
-            <p className="text-[11px] text-slate-500 leading-normal">
-              State-of-the-art diagnostic labs, interventional cardiology, and customized hypertension wellness programs.
-            </p>
-            <button 
-              onClick={() => onSetView('doctors')}
-              className="text-[10px] font-bold text-blue-600 hover:underline flex items-center gap-0.5"
+          {SERVICES.map((svc, i) => (
+            <motion.article
+              key={svc.title}
+              initial={{ opacity: 0, y: 16 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.15 + i * 0.06 }}
+              className="card-surface card-interactive p-5 space-y-3 group"
             >
-              Consult experts <ChevronRight />
-            </button>
-          </div>
-
-          <div className="bg-white p-5 rounded-3xl border border-slate-100 hover:border-slate-200 transition-all space-y-3">
-            <span className="p-2 bg-[#f0fdf4] text-[#16a34a] rounded-xl inline-block">
-              <Activity className="w-5 h-5" />
-            </span>
-            <h4 className="text-sm font-bold text-slate-900">Neurology & Stroke Center</h4>
-            <p className="text-[11px] text-slate-500 leading-normal">
-              Comprehensive treatment for chronic migraines, peripheral neuropathic disorders, and stroke post-recovery plans.
-            </p>
-            <button 
-              onClick={() => onSetView('doctors')}
-              className="text-[10px] font-bold text-emerald-600 hover:underline flex items-center gap-0.5"
-            >
-              Consult experts <ChevronRight />
-            </button>
-          </div>
-
-          <div className="bg-white p-5 rounded-3xl border border-slate-100 hover:border-slate-200 transition-all space-y-3">
-            <span className="p-2 bg-[#fef2f2] text-[#dc2626] rounded-xl inline-block">
-              <Clock className="w-5 h-5" />
-            </span>
-            <h4 className="text-sm font-bold text-slate-900">Level 1 Emergency Center</h4>
-            <p className="text-[11px] text-slate-500 leading-normal">
-              24/7 fully-equipped clinical trauma units, on-call pediatric emergency response teams, and zero-wait check-in protocols.
-            </p>
-            <button 
-              onClick={onScrollToEmergency}
-              className="text-[10px] font-bold text-red-600 hover:underline flex items-center gap-0.5"
-            >
-              Live Wait Times <ChevronRight />
-            </button>
-          </div>
-
-          <div className="bg-white p-5 rounded-3xl border border-slate-100 hover:border-slate-200 transition-all space-y-3">
-            <span className="p-2 bg-[#faf5ff] text-[#9333ea] rounded-xl inline-block">
-              <BookOpen className="w-5 h-5" />
-            </span>
-            <h4 className="text-sm font-bold text-slate-900">Preventative Medicine</h4>
-            <p className="text-[11px] text-slate-500 leading-normal">
-              Annual health physical panels, detailed vaccination checkups, and dietary counseling guided by longevity guidelines.
-            </p>
-            <button 
-              onClick={() => onSetView('booking')}
-              className="text-[10px] font-bold text-purple-600 hover:underline flex items-center gap-0.5 cursor-pointer"
-            >
-              Book Checkup Slots <ChevronRight />
-            </button>
-          </div>
+              <span className={`p-2.5 rounded-xl inline-block ${svc.color}`}>
+                <svc.icon className="w-5 h-5" />
+              </span>
+              <h3 className="text-sm font-bold text-slate-900">{svc.title}</h3>
+              <p className="text-xs text-slate-500 leading-relaxed">{svc.desc}</p>
+              <button
+                type="button"
+                onClick={() =>
+                  svc.action === 'emergency' ? onScrollToEmergency() : onSetView(svc.action)
+                }
+                className={`text-xs font-bold ${svc.linkClass} hover:underline flex items-center gap-0.5 cursor-pointer`}
+              >
+                {svc.cta}
+                <ChevronRight className="w-3.5 h-3.5 group-hover:translate-x-0.5 transition-transform" />
+              </button>
+            </motion.article>
+          ))}
         </div>
-      </div>
+      </section>
     </div>
   );
-}
-
-// Mini Icon helper
-function ChevronRight() {
-  return <span className="text-[11px] font-extrabold">→</span>;
 }

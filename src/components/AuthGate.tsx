@@ -64,9 +64,9 @@ export default function AuthGate({ onSuccess, title, description }: AuthGateProp
   };
 
   return (
-    <div className="bg-white rounded-3xl border border-slate-100 shadow-xl shadow-slate-100/40 overflow-hidden max-w-4xl mx-auto grid grid-cols-1 md:grid-cols-12 min-h-[520px]" id="auth-gate-interface">
+    <div className="card-surface overflow-hidden max-w-4xl mx-auto grid grid-cols-1 md:grid-cols-12 min-h-[520px] shadow-lg" id="auth-gate-interface">
       {/* Visual Column */}
-      <div className="md:col-span-5 bg-gradient-to-br from-blue-700 to-indigo-800 text-white p-6 md:p-8 flex flex-col justify-between relative overflow-hidden">
+      <div className="md:col-span-5 bg-gradient-to-br from-cyan-700 via-teal-700 to-indigo-800 text-white p-6 md:p-8 flex flex-col justify-between relative overflow-hidden">
         {/* Abstract background graphics */}
         <div className="absolute inset-0 bg-[radial-gradient(circle_at_30%_20%,rgba(255,255,255,0.08),transparent)] pointer-events-none" />
         
